@@ -1,0 +1,15 @@
+node_modules
+**/node_modules
+dist
+**/dist
+.next
+**/.next
+.git
+.env
+**/.env
+*.local
+.DS_Store
+coverage
+Dockerfile
+**/Dockerfile
+.dockerignore

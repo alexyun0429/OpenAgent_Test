@@ -68,7 +68,7 @@ export function FormLabel(props: React.ComponentProps<typeof Label>) {
   return <Label htmlFor={formItemId} {...props} />;
 }
 
-export function FormControl({ children }: { children: React.ReactElement }) {
+export function FormControl({ children }: { children: React.ReactElement<Record<string, unknown>> }) {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
 
   return React.cloneElement(children, {
