@@ -77,11 +77,21 @@ export function ContactsTable() {
                   {contact.verified ? 'Verified' : 'Pending'}
                 </td>
                 <td style={{ padding: '0.9rem 0.5rem' }}>
-                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    <Button disabled={contact.verified} onClick={() => handleVerify(contact.id)} type="button">
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <Button
+                      disabled={contact.verified}
+                      onClick={() => handleVerify(contact.id)}
+                      type="button"
+                      style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}
+                    >
                       Verify
                     </Button>
-                    <Button onClick={() => handleDelete(contact.id)} type="button" variant="ghost">
+                    <Button
+                      onClick={() => handleDelete(contact.id)}
+                      type="button"
+                      variant="danger"
+                      style={{ padding: '0.4rem 0.9rem', fontSize: '0.85rem' }}
+                    >
                       Delete
                     </Button>
                   </div>

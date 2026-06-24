@@ -3,33 +3,27 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'default' | 'secondary' | 'ghost';
+  variant?: 'default' | 'secondary' | 'ghost' | 'danger';
 };
 
-const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
-  default: 'background: var(--accent); color: white; border-color: transparent;',
-  secondary: 'background: var(--panel-strong); color: var(--foreground);',
-  ghost: 'background: transparent; color: var(--accent-strong);',
+const variantClass: Record<NonNullable<ButtonProps['variant']>, string> = {
+  default: 'btn-default',
+  secondary: 'btn-secondary',
+  ghost: 'btn-ghost',
+  danger: 'btn-danger',
 };
 
-export function Button({ className, style, variant = 'default', ...props }: ButtonProps) {
+export function Button({ className, style, variant = 'default', disabled, ...props }: ButtonProps) {
   return (
     <button
-      className={cn(className)}
+      className={cn('btn', variantClass[variant], className)}
+      disabled={disabled}
       style={{
-        borderRadius: 999,
-        border: '1px solid var(--border)',
         padding: '0.85rem 1.2rem',
         fontSize: '0.95rem',
         fontWeight: 600,
-        cursor: 'pointer',
-        ...Object.fromEntries(
-          variants[variant]
-            .split(';')
-            .map((rule) => rule.trim())
-            .filter(Boolean)
-            .map((rule) => rule.split(':').map((part) => part.trim())),
-        ),
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
         ...style,
       }}
       {...props}

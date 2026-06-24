@@ -10,6 +10,7 @@
   --accent-strong: #15803d;
   --highlight: #7c3aed;
   --success: #2f7d4d;
+  --danger: #dc2626;
 }
 
 * {
@@ -57,6 +58,50 @@ main {
   background: var(--panel);
   backdrop-filter: blur(18px);
   box-shadow: 0 18px 45px rgba(20, 52, 33, 0.08);
+}
+
+.btn {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.btn-default {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.btn-default:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.btn-secondary {
+  background: var(--panel-strong);
+  color: var(--foreground);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--accent-strong);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(20, 36, 26, 0.06);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
 }
 
 .page-grid {
