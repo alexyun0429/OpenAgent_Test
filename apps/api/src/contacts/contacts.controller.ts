@@ -31,11 +31,6 @@ export class ContactsController {
     return this.contactsService.update(id, updateContactDto);
   }
 
-  @Patch(':id/verify')
-  verify(@Param('id') id: string) {
-    return this.contactsService.verify(id);
-  }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.contactsService.remove(id);
