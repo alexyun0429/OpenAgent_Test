@@ -1,21 +1,29 @@
-import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator';
 
 export class CreateContactDto {
   @IsString()
   @IsNotEmpty()
-  @MaxLength(80)
-  firstName!: string;
+  firstName: string;
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(80)
-  lastName!: string;
+  lastName: string;
 
   @IsEmail()
-  email!: string;
+  email: string;
 
+  @Matches(/^(\+?61|0)[2-9]\d{8}$/, {
+    message: 'phone must be a valid Australian phone number',
+  })
+  phone: string;
+
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  @MaxLength(1000)
-  message!: string;
+  note?: string;
 }
