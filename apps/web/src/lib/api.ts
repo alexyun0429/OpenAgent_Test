@@ -1,43 +1,37 @@
-import type { Contact } from '@/types/contact';
+import type { Contact, CreateContactDto } from '@/types/contact';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: { 'Content-Type': 'application/json' },
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init?.headers || {}),
-    },
-    cache: 'no-store',
   });
-
-  if (!response.ok) {
-    throw new Error(`API request failed: ${response.status}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.message ?? `API error ${res.status}`);
   }
-
-  return response.json() as Promise<T>;
+  return res.json() as Promise<T>;
 }
 
-export function createContact(payload: Omit<Contact, 'id' | 'verified' | 'createdAt'>) {
-  return request<Contact>('/contacts', {
+export function createContact(dto: CreateContactDto): Promise<Contact> {
+  return request<Contact>('/api/contacts', {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(dto),
   });
 }
 
-export function getContacts() {
-  return request<Contact[]>('/contacts');
+export function getContacts(): Promise<Contact[]> {
+  return request<Contact[]>('/api/contacts');
 }
 
-export function verifyContact(id: string) {
-  return request<Contact>(`/contacts/${id}/verify`, {
+export function markVerified(id: string): Promise<Contact> {
+  return request<Contact>(`/api/contacts/${id}`, {
     method: 'PATCH',
+    body: JSON.stringify({ verified: true }),
   });
 }
 
-export function deleteContact(id: string) {
-  return request<Contact>(`/contacts/${id}`, {
-    method: 'DELETE',
-  });
+export function deleteContact(id: string): Promise<Contact> {
+  return request<Contact>(`/api/contacts/${id}`, { method: 'DELETE' });
 }
