@@ -4,7 +4,10 @@ export function Header() {
   return (
     <header style={{ padding: '1.25rem 0' }}>
       <main style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href="/contact-us" style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '0.08em' }}>
+        <Link
+          href="/contact-us"
+          style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--accent)' }}
+        >
           OPENAGENT
         </Link>
         <nav style={{ display: 'flex', gap: '1rem', color: 'var(--muted)' }}>

@@ -13,7 +13,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -56,47 +55,51 @@ export function ContactForm() {
   }
 
   return (
-    <section className="surface" style={{ borderRadius: 32, padding: '2rem' }}>
-      <p style={{ color: 'var(--accent)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Contact form</p>
-      <h2 style={{ fontSize: '2rem', margin: '0.5rem 0 1.5rem' }}>Tell us what you need.</h2>
+    <section
+      style={{
+        borderRadius: 16,
+        padding: '2rem',
+        background: '#f3f5f4',
+        border: '1px solid var(--border)',
+      }}
+    >
+      <p style={{ color: 'var(--muted)', margin: '0 0 1.5rem', lineHeight: 1.6 }}>
+        Fill in your details and we&apos;ll be in touch right away. Or if you prefer, call us on{' '}
+        <strong style={{ color: 'var(--foreground)' }}>13 24 34</strong>
+      </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} style={{ display: 'grid', gap: '1rem' }}>
-          <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="First name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Last name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="First name" aria-label="First name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input placeholder="Last name" aria-label="Last name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Email address" type="email" {...field} />
+                  <Input placeholder="Email address" type="email" aria-label="Email address" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -107,9 +110,8 @@ export function ContactForm() {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone</FormLabel>
                 <FormControl>
-                  <Input placeholder="Phone number" type="tel" {...field} />
+                  <Input placeholder="Phone number" type="tel" aria-label="Phone number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -120,18 +122,36 @@ export function ContactForm() {
             name="note"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Note</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="What should OpenAgent help you with?" rows={4} {...field} />
+                  <Textarea
+                    placeholder="What do you want to speak to us about"
+                    aria-label="What do you want to speak to us about"
+                    rows={6}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           {submissionError ? <p style={{ color: '#9f2d18' }}>{submissionError}</p> : null}
-          <Button disabled={form.formState.isSubmitting} type="submit">
+          <Button
+            disabled={form.formState.isSubmitting}
+            type="submit"
+            style={{ width: '100%', borderRadius: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}
+          >
             {form.formState.isSubmitting ? 'Sending...' : 'Send message'}
           </Button>
+          <p style={{ fontSize: '0.8rem', color: 'var(--muted)', margin: 0, lineHeight: 1.5 }}>
+            By sending a message you agree to the{' '}
+            <a href="#" style={{ color: 'var(--accent)' }}>
+              Terms and Condition
+            </a>{' '}
+            and{' '}
+            <a href="#" style={{ color: 'var(--accent)' }}>
+              Privacy Policy
+            </a>
+          </p>
         </form>
       </Form>
     </section>
