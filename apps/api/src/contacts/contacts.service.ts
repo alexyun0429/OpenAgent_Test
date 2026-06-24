@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
@@ -8,23 +7,27 @@ import { UpdateContactDto } from './dto/update-contact.dto';
 export class ContactsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(data: CreateContactDto) {
-    return this.prisma.contact.create({ data });
+  create(dto: CreateContactDto) {
+    return this.prisma.contact.create({ data: dto });
   }
 
   findAll() {
     return this.prisma.contact.findMany({ orderBy: { createdAt: 'desc' } });
   }
 
-  update(id: string, data: UpdateContactDto) {
-    return this.prisma.contact.update({ where: { id }, data });
+  async update(id: string, dto: UpdateContactDto) {
+    await this.findOneOrFail(id);
+    return this.prisma.contact.update({ where: { id }, data: dto });
   }
 
-  async verify(id: string) {
-    return this.update(id, { verified: true });
-  }
-
-  remove(id: string) {
+  async remove(id: string) {
+    await this.findOneOrFail(id);
     return this.prisma.contact.delete({ where: { id } });
+  }
+
+  private async findOneOrFail(id: string) {
+    const contact = await this.prisma.contact.findUnique({ where: { id } });
+    if (!contact) throw new NotFoundException(`Contact ${id} not found`);
+    return contact;
   }
 }
