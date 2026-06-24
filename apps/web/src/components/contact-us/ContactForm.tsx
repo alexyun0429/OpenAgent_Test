@@ -20,10 +20,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
-  firstName: z.string().min(2, 'First name is required.'),
-  lastName: z.string().min(2, 'Last name is required.'),
-  email: z.string().email('Enter a valid email address.'),
-  message: z.string().min(10, 'Message must be at least 10 characters.'),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Valid email address is required'),
+  phone: z.string().regex(/^(\+?61|0)[2-9]\d{8}$/, 'Must be a valid Australian phone number'),
+  note: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -38,7 +39,8 @@ export function ContactForm() {
       firstName: '',
       lastName: '',
       email: '',
-      message: '',
+      phone: '',
+      note: '',
     },
   });
 
@@ -47,7 +49,7 @@ export function ContactForm() {
 
     try {
       await createContact(values);
-      router.push('/thank-you');
+      router.push(`/thank-you?name=${encodeURIComponent(values.firstName)}`);
     } catch {
       setSubmissionError('Unable to submit the form right now.');
     }
@@ -67,7 +69,7 @@ export function ContactForm() {
                 <FormItem>
                   <FormLabel>First name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ava" {...field} />
+                    <Input placeholder="First name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -80,7 +82,7 @@ export function ContactForm() {
                 <FormItem>
                   <FormLabel>Last name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Cole" {...field} />
+                    <Input placeholder="Last name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,7 +96,7 @@ export function ContactForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="ava@example.com" type="email" {...field} />
+                  <Input placeholder="Email address" type="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -102,12 +104,25 @@ export function ContactForm() {
           />
           <FormField
             control={form.control}
-            name="message"
+            name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Message</FormLabel>
+                <FormLabel>Phone</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="What should OpenAgent help you with?" rows={6} {...field} />
+                  <Input placeholder="Phone number" type="tel" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="note"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Note</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="What should OpenAgent help you with?" rows={4} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -115,7 +130,7 @@ export function ContactForm() {
           />
           {submissionError ? <p style={{ color: '#9f2d18' }}>{submissionError}</p> : null}
           <Button disabled={form.formState.isSubmitting} type="submit">
-            {form.formState.isSubmitting ? 'Submitting...' : 'Submit request'}
+            {form.formState.isSubmitting ? 'Sending...' : 'Send message'}
           </Button>
         </form>
       </Form>
