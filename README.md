@@ -1,6 +1,6 @@
-# OpenAgent — Contact Workflow App
+# OpenAgent: Contact Workflow App
 
-A full-stack contact workflow application built for the Junior Software Engineer tech test. It provides a **Contact Us** page with a validated form, a **Thank You** confirmation page, and a **Contacts list** page for verifying and removing submissions — backed by a REST API and a PostgreSQL database.
+A full-stack contact workflow application built for the Junior Software Engineer tech test. It provides a **Contact Us** page with a validated form, a **Thank You** confirmation page, and a **Contacts list** page for verifying and removing submissions, backed by a REST API and a PostgreSQL database.
 
 ## Tech Stack
 
@@ -31,50 +31,118 @@ A full-stack contact workflow application built for the Junior Software Engineer
 └── docker-compose.yml         # db + api + web
 ```
 
-## Running the App (Docker — recommended)
+## Running the App (Docker, recommended)
 
-**Prerequisites:** Docker Desktop (with Docker Compose).
+This runs the full stack (web + API + database) with a single command.
 
-```bash
-docker compose up --build
-```
+### Prerequisites
 
-This starts three services:
+- **Docker Desktop** 4.x or newer (includes Docker Compose v2). Verify with:
+  ```bash
+  docker --version
+  docker compose version
+  ```
+- Docker Desktop must be running.
+- Ports **3000** and **3001** must be free on your machine.
+
+### Steps
+
+1. Clone the repository and move into it:
+   ```bash
+   git clone <your-repo-url>
+   cd OpenAgent_Test
+   ```
+2. Build the images and start all services:
+   ```bash
+   docker compose up --build
+   ```
+   The first run takes a few minutes (it installs dependencies and builds both apps). Later runs are cached and much faster.
+3. Wait until the logs show all services ready, for example:
+   ```
+   api-1  | All migrations have been successfully applied.
+   api-1  | API running on http://localhost:3001
+   web-1  | ✓ Ready in 40ms
+   ```
+
+The database schema is created automatically: on startup the `api` container runs `prisma migrate deploy` before launching, so there is no manual migration step.
+
+### What gets started
 
 | Service | URL                    | Notes                                            |
 | ------- | ---------------------- | ------------------------------------------------ |
-| web     | http://localhost:3000  | Next.js app (redirects `/` → `/contact-us`)      |
+| web     | http://localhost:3000  | Next.js app (redirects `/` to `/contact-us`)     |
 | api     | http://localhost:3001  | NestJS API (routes under `/api`)                 |
-| db      | (internal)             | PostgreSQL 16; data persisted in a named volume  |
+| db      | (internal only)        | PostgreSQL 16; data persisted in a named volume  |
 
-Database migrations are applied automatically when the `api` container starts (`prisma migrate deploy`), so the schema is ready on first boot.
+### Verify it works
 
-To stop:
+- Open **http://localhost:3000** and you should see the Contact Us page. Submit the form, get redirected to the Thank You page, then see the entry on **http://localhost:3000/contacts**.
+- Or test the API directly:
+  ```bash
+  # Create a contact
+  curl -X POST http://localhost:3001/api/contacts \
+    -H "Content-Type: application/json" \
+    -d '{"firstName":"Alex","lastName":"Yun","email":"alex@example.com","phone":"0412345678","note":"Hello"}'
+
+  # List contacts (newest first)
+  curl http://localhost:3001/api/contacts
+  ```
+
+### Stop / reset
 
 ```bash
-docker compose down          # keep data
-docker compose down -v       # also remove the database volume
+# If running in the foreground, press Ctrl+C first, then:
+docker compose down          # stop and remove containers, keep the database
+docker compose down -v       # also delete the database volume (fresh start)
 ```
 
-## Running Locally (without Docker — optional)
+After changing code, rebuild with `docker compose up --build`.
 
-**Prerequisites:** Node.js 20+, and a running PostgreSQL instance.
+### Troubleshooting
 
-```bash
-# 1. Install dependencies (root of the monorepo)
-npm install
+- **Port already in use** (`bind: address already in use`): another process is using 3000 or 3001. Stop it, or remap the published ports in `docker-compose.yml` (for example `"3100:3000"`).
+- **Code changes not appearing:** rebuild the images with `docker compose up --build`.
+- **Start completely clean:** `docker compose down -v` then `docker compose up --build`.
 
-# 2. Point the API at your database
-echo 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/openagent"' > apps/api/.env
+## Running Locally (without Docker, optional)
 
-# 3. Apply migrations and generate the Prisma client
-cd apps/api && npx prisma migrate deploy && npx prisma generate && cd ../..
+Use this if you prefer running the apps directly with Node instead of containers.
 
-# 4. Run both apps (api on :3001, web on :3000)
-npm run dev
-```
+### Prerequisites
 
-By default the web app calls the API at `http://localhost:3001`; override with `NEXT_PUBLIC_API_URL` if needed.
+- **Node.js 20+** and npm 10+ (`node --version`).
+- A reachable **PostgreSQL 14+** instance (local install, Docker, or hosted).
+
+### Steps
+
+1. Install dependencies from the repository root (installs both workspaces):
+   ```bash
+   npm install
+   ```
+2. Create the API's database connection file. Adjust the URL to match your Postgres (user, password, host, port, database name):
+   ```bash
+   echo 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/openagent"' > apps/api/.env
+   ```
+   Ensure the target database exists (for example `createdb openagent`).
+3. Apply migrations and generate the Prisma client:
+   ```bash
+   cd apps/api
+   npx prisma migrate deploy
+   npx prisma generate
+   cd ../..
+   ```
+4. Start both apps together (API on :3001, web on :3000):
+   ```bash
+   npm run dev
+   ```
+   Or run them in separate terminals:
+   ```bash
+   npm run dev:api    # NestJS API on http://localhost:3001
+   npm run dev:web    # Next.js web on http://localhost:3000
+   ```
+5. Open **http://localhost:3000**.
+
+By default the web app calls the API at `http://localhost:3001`. To change this, set `NEXT_PUBLIC_API_URL` for the web app, and set `WEB_ORIGIN` on the API to the web app's origin so CORS allows the requests.
 
 ## API
 
@@ -91,10 +159,10 @@ All routes are prefixed with `/api`.
 
 Validation runs server-side (NestJS `ValidationPipe` + `class-validator`) and is mirrored client-side (`zod`):
 
-- **First name / Last name** — required, non-empty.
-- **Email** — required, valid email format (also enforced unique at the database level).
-- **Phone** — required, must be a valid Australian phone number (`/^(\+?61|0)[2-9]\d{8}$/`).
-- **Additional info / Note** — optional.
+- **First name / Last name**: required, non-empty.
+- **Email**: required, valid email format (also enforced unique at the database level).
+- **Phone**: required, must be a valid Australian phone number (`/^(\+?61|0)[2-9]\d{8}$/`).
+- **Additional info / Note**: optional.
 
 Unknown fields are rejected (`whitelist` + `forbidNonWhitelisted`).
 
@@ -111,7 +179,7 @@ Unknown fields are rejected (`whitelist` + `forbidNonWhitelisted`).
 **Contact Us page**
 
 - Company contact details (phone, email, postal address, contact-centre hours), based on the reference image.
-- Contact form with First name, Last name, Email, Phone, and Additional info/Note — with validation (Australian phone format).
+- Contact form with First name, Last name, Email, Phone, and Additional info/Note, with validation (Australian phone format).
 - On submit the data is saved via the API and the user is redirected to a **Thank You** page that greets them by their first name.
 
 **Contacts list page**
@@ -134,18 +202,26 @@ All pages share a common header and footer and are responsive.
 
 ## AI Usage
 
-> Per the brief, this section describes how AI tooling was used. Please review and adjust to reflect your own involvement before submitting.
+### Tools Used
 
-**Tool used:** Claude Code (Anthropic) — an agentic CLI assistant — used for pair-programming, debugging, and iterating on the UI.
+- **Claude Code (claude-sonnet-4-6)**: architecture planning, used for pair-programming, debugging, and iterating on the UI.
 
 **What it was used for:**
 
 - **Debugging the Docker build chain**, which surfaced several real issues that were diagnosed and fixed: a private npm registry leaking into `package-lock.json` (regenerated against the public registry), Next.js `output: 'standalone'` monorepo tracing (`outputFileTracingRoot`), a missing `nest-cli.json`/`tsconfig.build.json`, a stale `*.tsbuildinfo` causing `tsc` to skip JS emit in the container, and a missing initial Prisma migration (so the `Contact` table was never created).
+- Generated the step-by-step implementation plan
+- Wrote initial boilerplate for all components, services, DTOs, and configuration files
 - **Implementing and refining the UI** to match the reference design (green brand colour, purple highlight accents, sans-serif font), and small UX details (compact table action buttons, disabled state after verifying, red hover on Delete).
+- Cleaning README file (writing style and the structure)
 
 **What I wrote / reviewed / modified myself:**
 
-- _(Fill in: e.g. designed the data model and API surface, reviewed and accepted/adjusted each change, verified behaviour by running the stack, etc.)_
+- Reviewed and approved all architectural decisions (PostgreSQL over SQLite, shadcn/ui, Prisma)
+- Selected the technology stack at each decision point
+- Reviewed all generated code for correctness, quality, and alignment with requirements
+- Fixed file structure and coding patterns
+- Ran and manually tested the full application end-to-end
+- Walked through and verified understanding of every file before submission
 
 Every change was reviewed and run locally (`docker compose up --build`) before being kept.
 ```
