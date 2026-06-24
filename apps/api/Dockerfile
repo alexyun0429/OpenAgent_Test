@@ -4,6 +4,7 @@ COPY package*.json ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/prisma ./apps/api/prisma/
+RUN npm config set registry https://registry.npmjs.org/
 RUN npm ci
 
 FROM node:20-alpine AS builder
