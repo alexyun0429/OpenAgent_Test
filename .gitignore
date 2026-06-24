@@ -1,7 +1,9 @@
 node_modules/
-.next/
 dist/
-coverage/
-*.log
-.DS_Store
+.next/
 .env
+*.local
+.DS_Store
+coverage/
+apps/api/.env
+apps/web/.env*
