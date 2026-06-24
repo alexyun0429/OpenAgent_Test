@@ -208,7 +208,7 @@ All pages share a common header and footer and are responsive.
 
 **What it was used for:**
 
-- **Debugging the Docker build chain**, which surfaced several real issues that were diagnosed and fixed: a private npm registry leaking into `package-lock.json` (regenerated against the public registry), Next.js `output: 'standalone'` monorepo tracing (`outputFileTracingRoot`), a missing `nest-cli.json`/`tsconfig.build.json`, a stale `*.tsbuildinfo` causing `tsc` to skip JS emit in the container, and a missing initial Prisma migration (so the `Contact` table was never created).
+- **Debugging the Docker build chain**, which surfaced several real issues that were diagnosed and fixed: an incorrect npm registry leaking into `package-lock.json` (regenerated against the public registry), Next.js `output: 'standalone'` monorepo tracing (`outputFileTracingRoot`), a missing `nest-cli.json`/`tsconfig.build.json`, a stale `*.tsbuildinfo` causing `tsc` to skip JS emit in the container, and a missing initial Prisma migration (so the `Contact` table was never created).
 - Generated the step-by-step implementation plan
 - Wrote initial boilerplate for all components, services, DTOs, and configuration files
 - **Implementing and refining the UI** to match the reference design (green brand colour, purple highlight accents, sans-serif font), and small UX details (compact table action buttons, disabled state after verifying, red hover on Delete).
