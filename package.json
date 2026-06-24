@@ -12,7 +12,11 @@
     "dev:web": "npm run dev --workspace apps/web",
     "build": "npm run build --workspace apps/api && npm run build --workspace apps/web",
     "docker:up": "docker compose up --build",
-    "docker:down": "docker compose down"
+    "docker:down": "docker compose down",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "apps/**/*.{ts,tsx,json}": ["prettier --write"]
   },
   "devDependencies": {
     "prettier": "^3.3.0",
